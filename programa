@@ -1,0 +1,128 @@
+import re
+import keyword
+
+
+# Definir patrones generales y ampliados para Python y otros lenguajes
+TOKENS_PYTHON = [
+    ('COMENTARIO_LINEA', r'#.*'),  # Comentarios de línea en Python
+    ('COMENTARIO_BLOQUE', r'/\*[\s\S]*?\*/'),  # Comentarios de bloque (C, C++)
+    ('CADENA_MULTILINEA',
+     r'("""[\s\S]*?"""|\'\'\'[\s\S]*?\')'),  # Cadenas multilínea
+    ('CADENA',
+     r'"[^"\n]*"|\'[^\']*\''),  # Cadenas de texto entre comillas dobles o simples
+    ('CARACTER', r"'[^'\n]'"),  # Caracteres entre comillas simples
+    ('OPERADOR_LOGICO', r'and|or|not|&&|\|\|'),  # Operadores lógicos
+    ('OPERADOR_COMPARACION', r'==|!=|<=|>=|<|>'),  # Operadores de comparación
+    ('OPERADOR_ASIGNACION', r'[\+\-\*/]?='),  # Operadores de asignación
+    ('OPERADOR_INCREMENTO', r'\+\+|--'),  # Incremento y decremento
+    ('OPERADOR_ARITMETICO', r'[+\-*/%]'),  # Operadores aritméticos
+    ('OPERADOR_BITWISE', r'&|\||~|\^|>>|<<'),  # Operadores a nivel de bits
+    ('PUNTUACION', r'[;,\(\)\{\}\[\]\.:]'),  # Puntuación
+    ('IDENTIFICADOR', r'[a-zA-Z_][a-zA-Z_0-9]*'),  # Identificadores
+    ('NUMERO', r'\d+(\.\d+)?'),  # Números (enteros y decimales)
+    ('ESPACIO', r'\s+'),  # Espacios en blanco
+    ('DESCONOCIDO', r'.')  # Cualquier otro carácter
+]
+
+
+# Palabras clave de Python y otros lenguajes (heurística)
+PALABRAS_CLAVE = keyword.kwlist + [
+    'if', 'else', 'while', 'for', 'return', 'int', 'float', 'char', 'void',
+    'break', 'continue', 'do', 'switch', 'case', 'default', 'struct', 'typedef',
+    'enum', 'const', 'sizeof', 'static', 'extern', 'union', 'volatile', 'print'
+]
+
+
+# Función para comprobar si una palabra es clave
+
+
+
+
+def es_palabra_clave(palabra):
+    return palabra in PALABRAS_CLAVE
+
+
+# Función principal del analizador léxico
+
+
+
+
+def analizador_lexico(codigo_fuente):
+    tokens_encontrados = []
+    lineas = codigo_fuente.splitlines()
+
+
+    for num_linea, linea in enumerate(lineas, start=1):
+        posicion = 0
+        while posicion < len(linea):
+            for token_tipo, patron in TOKENS_PYTHON:
+                patron_compilado = re.compile(patron)
+                coincidencia = patron_compilado.match(linea, posicion)
+
+
+                if coincidencia:
+                    texto = coincidencia.group(0)
+                    if token_tipo != 'ESPACIO':  # Ignorar los espacios
+                        # Identificar si es palabra clave
+                        if token_tipo == 'IDENTIFICADOR' and es_palabra_clave(texto):
+                            tokens_encontrados.append(
+                                (num_linea, 'PALABRA_CLAVE', texto))
+                        else:
+                            tokens_encontrados.append(
+                                (num_linea, token_tipo, texto))
+                    posicion = coincidencia.end(0)
+                    break
+
+
+    return tokens_encontrados
+
+
+# Función que lee el código fuente hasta encontrar dos saltos de línea consecutivos
+
+
+
+
+def leer_codigo_fuente():
+    print("Ingrese el código fuente a analizar (finalice con dos líneas vacías):")
+    source_code_lines = []
+    empty_lines_count = 0
+
+
+    while True:
+        line = input()
+        if line.strip() == "":  # Si la línea está vacía
+            empty_lines_count += 1
+            if empty_lines_count == 2:  # Detecta dos saltos de línea consecutivos
+                break
+        else:
+            empty_lines_count = 0  # Reinicia el contador si no es una línea vacía
+            source_code_lines.append(line)
+
+
+    source_code = "\n".join(source_code_lines)
+    return source_code
+
+
+
+
+# Bucle principal del analizador léxico
+while True:
+    print("\nAnalizador Léxico en Python (presiona 'q' para salir)")
+    print("---------------------------------------------")
+    codigo_fuente_usuario = leer_codigo_fuente()
+
+
+    if codigo_fuente_usuario.strip().lower() == 'q':  # Salir del bucle si se introduce 'q'
+        print("Saliendo del programa...")
+        break
+
+
+    # Procesar el código ingresado
+    tokens = analizador_lexico(codigo_fuente_usuario)
+
+
+    # Mostrar los tokens encontrados organizados por líneas
+    print("\nTokens encontrados:")
+    for token in tokens:
+        linea, tipo, texto = token
+        print(f"Línea {linea}: {tipo} -> {texto}")
