@@ -49,7 +49,7 @@ def analizador_lexico(codigo_fuente):
 def construir_arbol_sintactico(tokens, nombre_programa):
     g = Digraph('G', format='png')
     g.attr(size='10,10')  # Tamaño en pulgadas
-    g.attr(dpi='300')  # Establecer el DPI a 300 para una mejor calidad
+    g.attr(dpi='300')  # Establecer el DPI a 300 para mejor calidad
     nodo_id = 0
     pila_nodos = []  # Pila para manejar la jerarquía
 
@@ -58,33 +58,39 @@ def construir_arbol_sintactico(tokens, nombre_programa):
         nodo_id += 1
         return f"nodo{nodo_id}", etiqueta
 
-    # Crear el nodo raíz con el nombre del programa
+    # Crear el nodo raíz con el nombre del programa (no se agregará a la pila)
     raiz_id, raiz_etiqueta = nuevo_nodo(f"Programa: {nombre_programa}")
     g.node(raiz_id, raiz_etiqueta, shape='rect', style='filled', fillcolor='#A0D3E8')
-    pila_nodos.append(raiz_id)
+
+    # Usar un nodo actual que parte desde la raíz
+    nodo_actual = raiz_id
 
     for token in tokens:
         tipo, texto = token[1], token[2]
-        
-        # Manejar palabras clave y operadores como nodos hijos
+
+        # Crear nodos hijos según el tipo de token
         if tipo in ["PALABRA_CLAVE", "OPERADOR_ASIGNACION", "OPERADOR_COMPARACION", "OPERADOR_ARITMETICO"]:
             id_hijo, etiqueta_hijo = nuevo_nodo(texto)
             g.node(id_hijo, etiqueta_hijo)
-            g.edge(pila_nodos[-1], id_hijo)  # Conectar al nodo raíz
-            pila_nodos.append(id_hijo)  # Agregar nuevo nodo a la pila
+            g.edge(nodo_actual, id_hijo)  # Conectar con el nodo actual
+            pila_nodos.append(nodo_actual)  # Guardar el nodo actual en la pila
+            nodo_actual = id_hijo  # Actualizar el nodo actual al hijo recién creado
 
         elif tipo in ["NUMERO", "IDENTIFICADOR"]:
             id_hijo, etiqueta_hijo = nuevo_nodo(texto)
             g.node(id_hijo, etiqueta_hijo)
-            g.edge(pila_nodos[-1], id_hijo)  # Conectar al nodo actual
+            g.edge(nodo_actual, id_hijo)  # Conectar con el nodo actual
 
         # Si encontramos un punto y coma, volvemos al nodo padre
         elif tipo == "PUNTUACION" and texto == ';':
-            pila_nodos.pop()  # Volver al padre
+            if pila_nodos:
+                nodo_actual = pila_nodos.pop()  # Volver al nodo padre
 
     # Guardar el archivo en formato PNG y visualizarlo
     g.render('arbol_sintactico', format='png', view=True)
     messagebox.showinfo("Árbol Sintáctico", "Se generó el árbol sintáctico. Verifica el archivo 'arbol_sintactico.png'.")
+
+
 
 def analizador_semantico(tokens):
     tabla_simbolos = {}
