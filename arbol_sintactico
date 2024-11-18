@@ -1,0 +1,30 @@
+digraph G {
+	dpi=300 size="10,10"
+	nodo1 [label="Programa: MiPrograma" fillcolor="#A0D3E8" shape=rect style=filled]
+	nodo2 [label=a]
+	nodo1 -> nodo2
+	nodo3 [label="="]
+	nodo1 -> nodo3
+	nodo4 [label=4]
+	nodo3 -> nodo4
+	nodo5 [label=b]
+	nodo3 -> nodo5
+	nodo6 [label="="]
+	nodo3 -> nodo6
+	nodo7 [label=5]
+	nodo6 -> nodo7
+	nodo8 [label=c]
+	nodo6 -> nodo8
+	nodo9 [label="="]
+	nodo6 -> nodo9
+	nodo10 [label=a]
+	nodo9 -> nodo10
+	nodo11 [label="+"]
+	nodo9 -> nodo11
+	nodo12 [label=b]
+	nodo11 -> nodo12
+	nodo13 [label=print]
+	nodo11 -> nodo13
+	nodo14 [label=c]
+	nodo11 -> nodo14
+}
