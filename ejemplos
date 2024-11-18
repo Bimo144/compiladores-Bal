@@ -1,0 +1,26 @@
+# Este es un comentario
+a = 5
+b = 10
+c = a + b
+print(c)
+
+
+# Programa con una estructura condicional
+x = 15
+if x > 10:
+    print("x es mayor que 10")
+else:
+    print("x es menor o igual a 10")
+    
+# Bucle for
+for i in range(5):
+    print(i)
+
+
+# Código con errores intencionales
+a = 5
+b = "10"
+c = a + b  # Error: intento de sumar un número y una cadena
+
+if a == 5  # Error: falta de paréntesis de cierre
+    print("a es igual a 5")
